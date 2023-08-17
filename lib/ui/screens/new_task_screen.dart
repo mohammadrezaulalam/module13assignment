@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_manager_project_getx/ui/screens/update_task_status_sheet.dart';
+import 'package:task_manager_project_getx/ui/state_managers/delete_task_controller.dart';
 import 'package:task_manager_project_getx/ui/state_managers/get_summary_controller.dart';
 import 'package:task_manager_project_getx/ui/state_managers/new_task_controller.dart';
 import '../../data/models/network_response.dart';
@@ -40,74 +41,6 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     });
   }
 
-  // Future<void> getCountSummary() async {
-  //   _getCountSummaryInProgress = true;
-  //   if (mounted) {
-  //     setState(() {});
-  //   }
-  //
-  //   final NetworkResponse response = await NetworkCaller().getRequest(Urls.taskStatusCountUrl);
-  //
-  //   if (response.isSuccess) {
-  //     _summaryCountModel = SummaryCountModel.fromJson(response.body!);
-  //   } else {
-  //     if (mounted) {
-  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //           content: Text(
-  //         'Failed to get Summary Data',
-  //         style: snackBarText(chipBgColorRed),
-  //       )));
-  //     }
-  //   }
-  //   _getCountSummaryInProgress = false;
-  //   if (mounted) {
-  //     setState(() {});
-  //   }
-  // }
-
-  // Future<void> getNewTasks() async {
-  //   _getNewTaskInProgress = true;
-  //   if (mounted) {
-  //     setState(() {});
-  //   }
-  //
-  //   final NetworkResponse response = await NetworkCaller().getRequest(Urls.newTasksUrl);
-  //
-  //   if (response.isSuccess) {
-  //     _taskListModel = TaskListModel.fromJson(response.body!);
-  //   } else {
-  //     if (mounted) {
-  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //           content: Text(
-  //         'Failed to get New Task Data',
-  //         style: snackBarText(chipBgColorRed),
-  //       )));
-  //     }
-  //   }
-  //   _getNewTaskInProgress = false;
-  //   if (mounted) {
-  //     setState(() {});
-  //   }
-  // }
-
-  Future<void> deleteTask(String taskId) async {
-    final NetworkResponse response = await NetworkCaller().getRequest(Urls.deleteTasksUrl(taskId));
-    if(response.isSuccess){
-      newTaskController.taskListModel.data!.removeWhere((element) => element.sId == taskId);
-      if(mounted){
-        setState(() {});
-      }
-    }else{
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-              'Failed to delete Task Data',
-              style: snackBarText(chipBgColorRed),
-            )));
-      }
-    }
-  }
-
   Future<void> updateTaskStatus(String taskId, String newStatus) async {
     final NetworkResponse response = await NetworkCaller().getRequest(Urls.updateTaskStatusUrl(taskId, newStatus));
     if(response.isSuccess){
@@ -135,7 +68,6 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
           task: task,
           onUpdate: () {
             newTaskController.getNewTasks();
-            //getCountSummary();
           },
         );
       },
@@ -214,17 +146,41 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                           itemCount: newTaskController.taskListModel.data?.length ?? 0,
                           //reverse: true,
                           itemBuilder: (context, index) {
-                            return TaskListTile(
-                              chipBgColor: chipBgColorBlue,
-                              taskStatus: 'New',
-                              data: newTaskController.taskListModel.data![index],
-                              onDeleteTap: () {
-                                deleteTask(newTaskController.taskListModel.data![index].sId!);
-                              },
-                              onEditTap: () {
-                                //showEditBottomSheet(_taskListModel.data![index]);
-                                showStatusUpdateBottomSheet(newTaskController.taskListModel.data![index]);
-                              },
+                            return GetBuilder<DeleteTaskController>(
+                              builder: (deleteTaskController) {
+                                return TaskListTile(
+                                  chipBgColor: chipBgColorBlue,
+                                  taskStatus: 'New',
+                                  data: newTaskController.taskListModel.data![index],
+                                  onDeleteTap: () {
+                                    //deleteTask(newTaskController.taskListModel.data![index].sId!);
+                                    deleteTaskController.deleteTask(newTaskController.taskListModel.data![index].sId!).then((result) => {
+                                      if(result == true){
+                                        Get.snackbar(
+                                            'Success',
+                                            'Task Deleted Successfully',
+                                          colorText: Colors.white,
+                                        ),
+                                        newTaskController.taskListModel.data!.removeWhere((element) => element.sId == newTaskController.taskListModel.data![index].sId!),
+                                        setState(() {
+
+                                        })
+                                      }else{
+                                        Get.snackbar(
+                                          'Success',
+                                          'Task Deleted Successfully',
+                                          colorText: Colors.red,
+                                        )
+                                      }
+                                    });
+
+                                  },
+                                  onEditTap: () {
+                                    //showEditBottomSheet(_taskListModel.data![index]);
+                                    showStatusUpdateBottomSheet(newTaskController.taskListModel.data![index]);
+                                  },
+                                );
+                              }
                             );
                           },
                           separatorBuilder: (BuildContext context, int index) {

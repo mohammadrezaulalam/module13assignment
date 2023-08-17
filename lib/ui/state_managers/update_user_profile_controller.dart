@@ -28,7 +28,6 @@ class UpdateUserProfileController extends GetxController{
 
     final NetworkResponse response = await NetworkCaller().postRequest(Urls.userProfileUpdateUrl, requestBody);
     _updateUserProfileInProgress = false;
-    print(_updateUserProfileInProgress);
     update();
     if(response.isSuccess){
       userData.firstName = firstName;

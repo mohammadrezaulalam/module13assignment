@@ -54,30 +54,44 @@ class _UpdateTaskStatusSheetState extends State<UpdateTaskStatusSheet> {
                   );
                 }),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: Visibility(
-                visible: updateTaskStatusController.updateTaskStatusInProgress == false,
-                replacement: const Center(child: CircularProgressIndicator(),),
-                child: ElevatedButton(
-                  onPressed: (){
-                    updateTaskStatusController.updateTaskStatus(widget.task.sId.toString(), _selectedTask, widget.onUpdate).then((result) => {
-                      if(result == true){
-                        Get.back(),
-                        Get.snackbar('Success', 'Status Update Successful')
-                      }else{
-                        Get.snackbar('Failed', 'Status Update Failed')
-                      }
-                    });
-                    //updateTaskStatus(widget.task.sId!, _selectedTask);
-                  },
-                  style: appButtonStyle(),
-                  child: Text('Update', style: appHeadingText5(colorWhite),),
+          GetBuilder<UpdateTaskStatusController>(
+            builder: (_) {
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: updateTaskStatusController.updateTaskStatusInProgress
+                      ? const Center(child: CircularProgressIndicator(),)
+                      : ElevatedButton(
+                    onPressed: (){
+                      updateTaskStatusController.updateTaskStatus(widget.task.sId.toString(), _selectedTask, widget.onUpdate).then((result) => {
+                        if(result == true){
+                          Get.back(),
+                          Get.snackbar(
+                              'Success', 
+                              'Status Update Successful',
+                              titleText: Text('Success',style: getSnackBarTextHeading(colorGreen), ),
+                              messageText: Text('Status Update Successful', style: getSnackBarTextMessage(colorGreen),),
+                              colorText: Colors.green,
+                              backgroundColor: const Color.fromRGBO(148,148,148, 0.7),
+                            snackPosition: SnackPosition.BOTTOM
+                          )
+                        }else{
+                          Get.snackbar(''
+                              'Failed', 
+                              'Status Update Failed', 
+                              colorText: Colors.red,
+                          )
+                        }
+                      });
+                      //updateTaskStatus(widget.task.sId!, _selectedTask);
+                    },
+                    style: appButtonStyle(),
+                    child: Text('Update', style: appHeadingText5(colorWhite),),
+                  ),
                 ),
-              ),
-            ),
+              );
+            }
           ),
         ],
       ),

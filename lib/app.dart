@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_manager_project_getx/ui/screens/splash_screen.dart';
 import 'package:task_manager_project_getx/ui/state_managers/add_new_task_controller.dart';
+import 'package:task_manager_project_getx/ui/state_managers/delete_task_controller.dart';
 import 'package:task_manager_project_getx/ui/state_managers/email_verification_controller.dart';
 import 'package:task_manager_project_getx/ui/state_managers/login_controller.dart';
 import 'package:task_manager_project_getx/ui/state_managers/otp_verification_controller.dart';
@@ -50,6 +51,7 @@ class ControllerBinding extends Bindings{
     Get.put<OtpVerificationController>(OtpVerificationController());
     Get.put<ResetPasswordController>(ResetPasswordController());
     Get.put<AddNewTaskController>(AddNewTaskController());
+    Get.put<DeleteTaskController>(DeleteTaskController());
   }
 
 }

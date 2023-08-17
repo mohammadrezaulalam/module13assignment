@@ -189,36 +189,40 @@ class _UpdateUserProfileScreenState extends State<UpdateUserProfileScreen> {
                       const SizedBox(
                         height: 12,
                       ),
-                      SizedBox(
-                        width: double.infinity,
-                        child: updateUserProfileController.updateUserProfileInProgress == true
-                            ? const Center(child: CircularProgressIndicator(),)
-                            : ElevatedButton(
-                          onPressed: () {
-                            if(!_formKey.currentState!.validate()){
-                              return;
-                            }
-                            updateUserProfileController.updateUserProfile(_firstNameTEController.text.trim(), _lastNameTEController.text.trim(), _mobileTEController.text.trim(), _passwordTEController.text).then((result) => {
-                              if(result == true){
-                                Get.snackbar(
-                                  'Success',
-                                  'Profile Update Successful',
-                                  colorText: Colors.white,
-                                  padding: const EdgeInsets.all(15),
-                                ),
-                              }else{
-                                Get.snackbar(
-                                  'Success',
-                                  'Profile Update Successful',
-                                  colorText: Colors.red,
-                                  padding: const EdgeInsets.all(15),
-                                ),
-                              }
-                            });
-                          },
-                          style: appButtonStyle(),
-                          child: const Icon(Icons.arrow_circle_right_outlined),
-                        ),
+                      GetBuilder<UpdateUserProfileController>(
+                        builder: (_) {
+                          return SizedBox(
+                            width: double.infinity,
+                            child: updateUserProfileController.updateUserProfileInProgress == true
+                                ? const Center(child: CircularProgressIndicator(),)
+                                : ElevatedButton(
+                              onPressed: () {
+                                if(!_formKey.currentState!.validate()){
+                                  return;
+                                }
+                                updateUserProfileController.updateUserProfile(_firstNameTEController.text.trim(), _lastNameTEController.text.trim(), _mobileTEController.text.trim(), _passwordTEController.text).then((result) => {
+                                  if(result == true){
+                                    Get.snackbar(
+                                      'Success',
+                                      'Profile Update Successful',
+                                      colorText: Colors.white,
+                                      padding: const EdgeInsets.all(15),
+                                    ),
+                                  }else{
+                                    Get.snackbar(
+                                      'Success',
+                                      'Profile Update Successful',
+                                      colorText: Colors.red,
+                                      padding: const EdgeInsets.all(15),
+                                    ),
+                                  }
+                                });
+                              },
+                              style: appButtonStyle(),
+                              child: const Icon(Icons.arrow_circle_right_outlined),
+                            ),
+                          );
+                        }
                       ),
                     ],
                   ),

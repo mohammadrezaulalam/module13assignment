@@ -9,7 +9,7 @@ class CancelledTaskController extends GetxController{
   bool _getCancelledTaskInProgress = false;
   bool get getCancelledTaskInProgress => _getCancelledTaskInProgress;
   TaskListModel _taskListModel = TaskListModel();
-  TaskListModel get tasklistModel => _taskListModel;
+  TaskListModel get taskListModel => _taskListModel;
 
   Future<bool> getCancelledTasks() async {
     _getCancelledTaskInProgress = true;

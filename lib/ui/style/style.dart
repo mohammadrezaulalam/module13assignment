@@ -65,6 +65,22 @@ TextStyle listTileTitle(textColor){
   );
 }
 
+TextStyle getSnackBarTextHeading(textColor){
+  return GoogleFonts.oxygen(
+    fontSize: 16,
+    color: textColor,
+    fontWeight: FontWeight.w700,
+  );
+}
+
+TextStyle getSnackBarTextMessage(textColor){
+  return GoogleFonts.oxygen(
+    fontSize: 15,
+    color: textColor,
+    fontWeight: FontWeight.w600,
+  );
+}
+
 TextStyle listTileSubTitle(){
   return GoogleFonts.oxygen(
     fontSize: 14,

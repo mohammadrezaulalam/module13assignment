@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_manager_project_getx/ui/screens/update_task_status_sheet.dart';
 import 'package:task_manager_project_getx/ui/state_managers/cancelled_task_controller.dart';
-import '../../data/models/network_response.dart';
+import 'package:task_manager_project_getx/ui/state_managers/delete_task_controller.dart';
 import '../../data/models/task_list_model.dart';
-import '../../data/services/network_caller.dart';
-import '../../data/utils/urls.dart';
 import '../style/style.dart';
 import '../widgets/task_list_tile.dart';
 import '../widgets/user_profile_banner.dart';
@@ -28,50 +26,6 @@ class _CancelledTaskScreenState extends State<CancelledTaskScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       cancelledTaskController.getCancelledTasks();
     });
-  }
-
-  // Future<void> getCancelledTasks() async {
-  //   _getCancelledTaskInProgress = true;
-  //   if (mounted) {
-  //     setState(() {});
-  //   }
-  //
-  //   final NetworkResponse response =
-  //       await NetworkCaller().getRequest(Urls.cancelledTasksUrl);
-  //
-  //   if (response.isSuccess) {
-  //     _taskListModel = TaskListModel.fromJson(response.body!);
-  //   } else {
-  //     if (mounted) {
-  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //           content: Text(
-  //         'Failed to get Cancelled Task Data',
-  //         style: snackBarText(chipBgColorRed),
-  //       )));
-  //     }
-  //   }
-  //   _getCancelledTaskInProgress = false;
-  //   if (mounted) {
-  //     setState(() {});
-  //   }
-  // }
-
-  Future<void> deleteTask(String taskId) async {
-    final NetworkResponse response = await NetworkCaller().getRequest(Urls.deleteTasksUrl(taskId));
-    if(response.isSuccess){
-      cancelledTaskController.tasklistModel.data!.removeWhere((element) => element.sId == taskId);
-      if(mounted){
-        setState(() {});
-      }
-    }else{
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-              'Failed to delete Task Data',
-              style: snackBarText(chipBgColorRed),
-            )));
-      }
-    }
   }
 
   void showStatusUpdateBottomSheet(TaskData task){
@@ -109,20 +63,41 @@ class _CancelledTaskScreenState extends State<CancelledTaskScreen> {
                           child: CircularProgressIndicator(),
                         )
                       : ListView.separated(
-                          itemCount: cancelledTaskController.tasklistModel.data?.length ?? 0,
+                          itemCount: cancelledTaskController.taskListModel.data?.length ?? 0,
                           itemBuilder: (context, index) {
-                            return TaskListTile(
-                              chipBgColor: chipBgColorRed,
-                              taskStatus: 'Cancelled',
-                              data: cancelledTaskController.tasklistModel.data![index],
-                              onDeleteTap: () {
-                                deleteTask(cancelledTaskController.tasklistModel.data![index].sId!);
-                              },
-                              onEditTap: () {
-                                showStatusUpdateBottomSheet(cancelledTaskController.tasklistModel.data![index]);
-                              },
+                            return GetBuilder<DeleteTaskController>(
+                              builder: (deleteTaskController) {
+                                return TaskListTile(
+                                  chipBgColor: chipBgColorRed,
+                                  taskStatus: 'Cancelled',
+                                  data: cancelledTaskController.taskListModel.data![index],
+                                  onDeleteTap: () {
+                                    deleteTaskController.deleteTask(cancelledTaskController.taskListModel.data![index].sId!).then((result) => {
+                                      if(result == true){
+                                        Get.snackbar(
+                                          'Success',
+                                          'Task Deleted Successfully',
+                                          colorText: Colors.white,
+                                        ),
+                                        cancelledTaskController.taskListModel.data!.removeWhere((element) => element.sId == cancelledTaskController.taskListModel.data![index].sId!),
+                                        setState(() {
+
+                                        })
+                                      }else{
+                                        Get.snackbar(
+                                          'Failed',
+                                          'Task Deletion Unsuccessful',
+                                          colorText: Colors.red,
+                                        )
+                                      }
+                                    });
+                                  },
+                                  onEditTap: () {
+                                    showStatusUpdateBottomSheet(cancelledTaskController.taskListModel.data![index]);
+                                  },
+                                );
+                              }
                             );
-                            //return SizedBox();
                           },
                           separatorBuilder: (BuildContext context, int index) {
                             return const Divider();

@@ -9,13 +9,12 @@ class UpdateTaskStatusController extends GetxController{
   bool get updateTaskStatusInProgress => _updateTaskStatusInProgress;
 
   Future<bool> updateTaskStatus(String taskId, String newStatus, var onUpdate) async {
-    _updateTaskStatusInProgress = false;
+    _updateTaskStatusInProgress = true;
     update();
     final NetworkResponse response = await NetworkCaller().getRequest(Urls.updateTaskStatusUrl(taskId, newStatus));
 
-
+    _updateTaskStatusInProgress = false;
     if(response.isSuccess){
-
       onUpdate();
       return true;
     }else{
